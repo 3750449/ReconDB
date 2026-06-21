@@ -1,0 +1,25 @@
+# Python
+
+**pycache**/
+*.pyc
+
+# Linux
+
+*.swp
+*.tmp
+
+# VS Code
+
+.vscode/
+
+# Fastfetch local config
+
+.config/
+
+# Logs
+
+*.log
+
+# Environment files
+
+.env

@@ -1,0 +1,19 @@
+Target
+ │
+ ├── DNS_Record
+ │
+ └── Network_Asset
+          │
+          ├── Port_Service
+          │
+          ├── Vulnerability
+          │
+          ├── Web_Technology
+          │
+          └── Asset_Tag
+                   │
+                   └── Tag
+
+Target
+ │
+ └── Scan_Job
