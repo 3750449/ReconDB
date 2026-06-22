@@ -1,0 +1,96 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+.dashboard {
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.header p {
+  color: #94a3b8;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.card span {
+  display: block;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.card strong {
+  font-size: 2rem;
+  color: #38bdf8;
+}
+
+.error {
+  background: #7f1d1d;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+.table-section {
+  margin-top: 2rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.table-section h2 {
+  margin-top: 0;
+  color: #e2e8f0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #334155;
+  text-align: left;
+}
+
+th {
+  color: #94a3b8;
+}
+
+td {
+  color: #e2e8f0;
+}
+
+.table-section {
+  display: block;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  background: #1e293b;
+  border: 2px solid #38bdf8;
+  border-radius: 12px;
+  padding: 1.5rem;
+}

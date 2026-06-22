@@ -1,8 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import pymysql
 import os
 
 app = FastAPI(title="ReconDB API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 DB_CONFIG = {
     "host": "localhost",
@@ -16,9 +25,13 @@ DB_CONFIG = {
 def root():
     return {"message": "ReconDB API Online"}
 
+
 @app.get("/targets")
 def get_targets():
-    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
     cur = conn.cursor()
 
     cur.execute("""
@@ -36,7 +49,10 @@ def get_targets():
 
 @app.get("/ports")
 def get_ports():
-    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
     cur = conn.cursor()
 
     cur.execute("""
@@ -64,7 +80,10 @@ def get_ports():
 
 @app.get("/domains")
 def get_domains():
-    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
     cur = conn.cursor()
 
     cur.execute("""
@@ -84,9 +103,13 @@ def get_domains():
 
     return rows
 
+
 @app.get("/whois")
 def get_whois():
-    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
     cur = conn.cursor()
 
     cur.execute("""
@@ -106,16 +129,20 @@ def get_whois():
 
     return rows
 
+
 @app.get("/summary")
 def get_summary():
-    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
     cur = conn.cursor()
 
     cur.execute("""
         SELECT
             (SELECT COUNT(*) FROM target) AS targets,
             (SELECT COUNT(*) FROM network_asset) AS assets,
-            (SELECT COUNT(*) FROM port_service WHERE state = 'open') AS open_ports,
+            (SELECT COUNT(*) FROM port_service WHERE state='open') AS open_ports,
             (SELECT COUNT(*) FROM vulnerability) AS vulnerabilities,
             (SELECT COUNT(*) FROM dns_record) AS dns_records,
             (SELECT COUNT(*) FROM web_technology) AS web_technologies,
@@ -130,4 +157,3 @@ def get_summary():
     conn.close()
 
     return row
-
