@@ -157,3 +157,61 @@ def get_summary():
     conn.close()
 
     return row
+
+@app.get("/scans")
+def get_scans():
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            s.scan_id,
+            t.target_name,
+            s.scan_type,
+            s.tool_used,
+            s.scan_scope,
+            s.scan_status,
+            s.completed_at
+        FROM scan_job s
+        JOIN target t ON s.target_id = t.target_id
+        ORDER BY s.completed_at DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return rows
+
+@app.get("/scans")
+def get_scans():
+    conn = pymysql.connect(
+        **DB_CONFIG,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            s.scan_id,
+            t.target_name,
+            s.scan_type,
+            s.tool_used,
+            s.scan_scope,
+            s.scan_status,
+            s.completed_at
+        FROM scan_job s
+        JOIN target t ON s.target_id = t.target_id
+        ORDER BY s.completed_at DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return rows

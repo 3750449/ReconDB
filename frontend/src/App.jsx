@@ -11,6 +11,7 @@ function App() {
   const [domains, setDomains] = useState([])
   const [whois, setWhois] = useState([])
   const [error, setError] = useState('')
+  const [scans, setScans] = useState([])
 
   useEffect(() => {
     axios
@@ -40,6 +41,12 @@ function App() {
       .get(`${API_BASE}/whois`)
       .then((res) => setWhois(res.data))
       .catch(console.error)
+
+    axios
+      .get(`${API_BASE}/scans`)
+      .then((res) => setScans(res.data))
+      .catch(console.error)
+
   }, [])
 
   return (
@@ -147,6 +154,36 @@ function App() {
           </tbody>
         </table>
       </section>
+
+<section className="table-section">
+  <h2>Scan History</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Target</th>
+        <th>Tool</th>
+        <th>Status</th>
+        <th>Completed</th>
+        <th>Scope</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {scans.map((scan) => (
+        <tr key={scan.scan_id}>
+          <td>{scan.scan_id}</td>
+          <td>{scan.target_name}</td>
+          <td>{scan.tool_used}</td>
+          <td>{scan.scan_status}</td>
+          <td>{scan.completed_at}</td>
+          <td>{scan.scan_scope}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</section>
     </main>
   )
 }
