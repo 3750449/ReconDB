@@ -116,12 +116,35 @@ function App() {
         <p>Loading dashboard...</p>
       ) : (
         <section className="cards">
-          <div className="card"><span>Targets</span><strong>{summary.targets}</strong></div>
-          <div className="card"><span>Assets</span><strong>{summary.assets}</strong></div>
-          <div className="card"><span>Open Ports</span><strong>{summary.open_ports}</strong></div>
-          <div className="card"><span>Vulnerabilities</span><strong>{summary.vulnerabilities}</strong></div>
-          <div className="card"><span>Domains</span><strong>{summary.domains}</strong></div>
-          <div className="card"><span>WHOIS Records</span><strong>{summary.whois_records}</strong></div>
+          <div className="card">
+            <span>Targets</span>
+            <strong>{summary.targets}</strong>
+          </div>
+
+          <div className="card">
+            <span>Assets</span>
+            <strong>{summary.assets}</strong>
+          </div>
+
+          <div className="card">
+            <span>Open Ports</span>
+            <strong>{summary.open_ports}</strong>
+          </div>
+
+          <div className="card">
+            <span>Vulnerabilities</span>
+            <strong>{summary.vulnerabilities}</strong>
+          </div>
+
+          <div className="card">
+            <span>Domains</span>
+            <strong>{summary.domains}</strong>
+          </div>
+
+          <div className="card">
+            <span>WHOIS Records</span>
+            <strong>{summary.whois_records}</strong>
+          </div>
         </section>
       )}
 
@@ -234,7 +257,7 @@ function App() {
       <section className="table-section">
         <h2>Scan History</h2>
 
-        <table>
+        <table className="scan-table">
           <thead>
             <tr>
               <th>ID</th>
