@@ -67,6 +67,16 @@ function ResetBadge({ value }) {
   return <span className={`badge ${className}`}>{label}</span>
 }
 
+function NoResultsRow({ colSpan }) {
+  return (
+    <tr>
+      <td className="no-results" colSpan={colSpan}>
+        No results match your search.
+      </td>
+    </tr>
+  )
+}
+
 function App() {
   const [summary, setSummary] = useState(null)
   const [targets, setTargets] = useState([])
@@ -228,13 +238,17 @@ function App() {
           </thead>
 
           <tbody>
-            {filteredTargets.map((target) => (
-              <tr key={target.target_id}>
-                <td>{target.target_id}</td>
-                <td>{target.target_name}</td>
-                <td>{target.target_type}</td>
-              </tr>
-            ))}
+            {filteredTargets.length === 0 ? (
+              <NoResultsRow colSpan={3} />
+            ) : (
+              filteredTargets.map((target) => (
+                <tr key={target.target_id}>
+                  <td>{target.target_id}</td>
+                  <td>{target.target_name}</td>
+                  <td>{target.target_type}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
@@ -256,19 +270,23 @@ function App() {
           </thead>
 
           <tbody>
-            {filteredPorts.map((port, index) => (
-              <tr key={index}>
-                <td>{port.target_name}</td>
-                <td>{port.hostname}</td>
-                <td>{port.ip_address}</td>
-                <td>{port.port_number}</td>
-                <td>{port.protocol}</td>
-                <td>{port.service_name}</td>
-                <td>
-                  <StatusBadge value={port.state} />
-                </td>
-              </tr>
-            ))}
+            {filteredPorts.length === 0 ? (
+              <NoResultsRow colSpan={7} />
+            ) : (
+              filteredPorts.map((port, index) => (
+                <tr key={index}>
+                  <td>{port.target_name}</td>
+                  <td>{port.hostname}</td>
+                  <td>{port.ip_address}</td>
+                  <td>{port.port_number}</td>
+                  <td>{port.protocol}</td>
+                  <td>{port.service_name}</td>
+                  <td>
+                    <StatusBadge value={port.state} />
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
@@ -287,14 +305,18 @@ function App() {
           </thead>
 
           <tbody>
-            {filteredDomains.map((domain, index) => (
-              <tr key={index}>
-                <td>{domain.domain_name}</td>
-                <td>{domain.subdomain_name}</td>
-                <td>{domain.ip_address}</td>
-                <td>{formatDate(domain.created_at)}</td>
-              </tr>
-            ))}
+            {filteredDomains.length === 0 ? (
+              <NoResultsRow colSpan={4} />
+            ) : (
+              filteredDomains.map((domain, index) => (
+                <tr key={index}>
+                  <td>{domain.domain_name}</td>
+                  <td>{domain.subdomain_name}</td>
+                  <td>{domain.ip_address}</td>
+                  <td>{formatDate(domain.created_at)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
@@ -312,13 +334,17 @@ function App() {
           </thead>
 
           <tbody>
-            {filteredWhois.map((record, index) => (
-              <tr key={index}>
-                <td>{record.domain_name}</td>
-                <td>{formatDate(record.collected_at)}</td>
-                <td>{record.whois_preview}</td>
-              </tr>
-            ))}
+            {filteredWhois.length === 0 ? (
+              <NoResultsRow colSpan={3} />
+            ) : (
+              filteredWhois.map((record, index) => (
+                <tr key={index}>
+                  <td>{record.domain_name}</td>
+                  <td>{formatDate(record.collected_at)}</td>
+                  <td>{record.whois_preview}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
@@ -341,22 +367,26 @@ function App() {
           </thead>
 
           <tbody>
-            {filteredScans.map((scan) => (
-              <tr key={scan.scan_id}>
-                <td>{scan.scan_id}</td>
-                <td>{scan.scanTarget}</td>
-                <td>{scan.osintDomain}</td>
-                <td>{scan.ports}</td>
-                <td>
-                  <ResetBadge value={scan.resetMode} />
-                </td>
-                <td>{scan.tool_used}</td>
-                <td>
-                  <StatusBadge value={scan.scan_status} />
-                </td>
-                <td>{formatDate(scan.completed_at)}</td>
-              </tr>
-            ))}
+            {filteredScans.length === 0 ? (
+              <NoResultsRow colSpan={8} />
+            ) : (
+              filteredScans.map((scan) => (
+                <tr key={scan.scan_id}>
+                  <td>{scan.scan_id}</td>
+                  <td>{scan.scanTarget}</td>
+                  <td>{scan.osintDomain}</td>
+                  <td>{scan.ports}</td>
+                  <td>
+                    <ResetBadge value={scan.resetMode} />
+                  </td>
+                  <td>{scan.tool_used}</td>
+                  <td>
+                    <StatusBadge value={scan.scan_status} />
+                  </td>
+                  <td>{formatDate(scan.completed_at)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
