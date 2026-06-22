@@ -93,3 +93,16 @@ SELECT
     LEFT(w.raw_output, 120) AS whois_preview
 FROM domain d
 JOIN whois_record w ON d.domain_id = w.domain_id;
+
+-- Scan job history
+SELECT
+    t.target_name,
+    s.scan_type,
+    s.tool_used,
+    s.scan_scope,
+    s.scan_status,
+    s.completed_at
+FROM scan_job s
+JOIN target t ON s.target_id = t.target_id
+ORDER BY s.completed_at DESC;
+

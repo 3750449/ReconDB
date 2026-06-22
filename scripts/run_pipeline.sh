@@ -106,6 +106,9 @@ fi
 echo "[+] Importing scan..."
 python3 backend/ingest_nmap.py data/scan.xml "$SCAN_TARGET"
 
+echo "[+] Logging scan job..."
+python3 backend/log_scan_job.py "$SCAN_TARGET" "$OSINT_DOMAIN" "${PORTS:-default}" "$RESET_DB"
+
 echo "[+] Running OSINT DNS lookup for $OSINT_DOMAIN..."
 python3 backend/dns_lookup.py "$OSINT_DOMAIN"
 
