@@ -7,9 +7,16 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_ROOT" || exit 1
 
+RESET_DB=true
+
 usage() {
     echo "Usage:"
-    echo "  piperecon [scan_target] [osint_domain] [ports]"
+    echo "  piperecon [options] [scan_target] [osint_domain] [ports]"
+    echo
+    echo "Options:"
+    echo "  --no-reset     Keep existing database data"
+    echo "  --reset        Reset database before scan"
+    echo "  -h, --help     Show help"
     echo
     echo "Examples:"
     echo "  piperecon"
@@ -17,6 +24,7 @@ usage() {
     echo "  piperecon juice-shop.lab.pentest-forge.com pentest-forge.com"
     echo "  piperecon https://juice-shop.lab.pentest-forge.com pentest-forge.com"
     echo "  piperecon pentest-ground.com pentest-ground.com \"81,4280,5013,6379,7001,9000\""
+    echo "  piperecon --no-reset pentest-ground.com pentest-ground.com \"81,4280,5013,6379,7001,9000\""
 }
 
 normalize_input() {
@@ -29,10 +37,27 @@ normalize_input() {
     echo "$value"
 }
 
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    usage
-    exit 0
-fi
+while [[ "$1" == --* || "$1" == "-h" ]]; do
+    case "$1" in
+        --no-reset)
+            RESET_DB=false
+            shift
+            ;;
+        --reset)
+            RESET_DB=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            exit 1
+            ;;
+    esac
+done
 
 if [ "$#" -eq 0 ]; then
     RAW_SCAN_TARGET="127.0.0.1"
@@ -56,13 +81,19 @@ fi
 
 OSINT_DOMAIN="${OSINT_INPUT%%:*}"
 
+mkdir -p data
+
 read -s -p "MySQL password: " MYSQL_PWD
 echo
 export MYSQL_PWD
 
-echo "[+] Resetting database..."
-mysql -u desmond < sql/01_schema.sql
-mysql -u desmond < sql/02_seed_data.sql
+if [ "$RESET_DB" = true ]; then
+    echo "[+] Resetting database..."
+    mysql -u desmond < sql/01_schema.sql
+    mysql -u desmond < sql/02_seed_data.sql
+else
+    echo "[+] Skipping database reset..."
+fi
 
 if [ -n "$PORTS" ]; then
     echo "[+] Running nmap scan against $SCAN_TARGET on ports $PORTS..."
