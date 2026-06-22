@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import './App.css'
 
@@ -48,6 +48,14 @@ function parseScanScope(scope) {
   return result
 }
 
+function matchesSearch(item, searchTerm) {
+  if (!searchTerm) return true
+
+  return JSON.stringify(item)
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase())
+}
+
 function StatusBadge({ value }) {
   return <span className={`badge badge-${value}`}>{value}</span>
 }
@@ -66,6 +74,7 @@ function App() {
   const [domains, setDomains] = useState([])
   const [whois, setWhois] = useState([])
   const [scans, setScans] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -102,6 +111,47 @@ function App() {
       .then((res) => setScans(res.data))
       .catch(console.error)
   }, [])
+
+  const filteredTargets = useMemo(
+    () => targets.filter((target) => matchesSearch(target, searchTerm)),
+    [targets, searchTerm]
+  )
+
+  const filteredPorts = useMemo(
+    () => ports.filter((port) => matchesSearch(port, searchTerm)),
+    [ports, searchTerm]
+  )
+
+  const filteredDomains = useMemo(
+    () => domains.filter((domain) => matchesSearch(domain, searchTerm)),
+    [domains, searchTerm]
+  )
+
+  const filteredWhois = useMemo(
+    () => whois.filter((record) => matchesSearch(record, searchTerm)),
+    [whois, searchTerm]
+  )
+
+  const preparedScans = useMemo(
+    () =>
+      scans.map((scan) => {
+        const scope = parseScanScope(scan.scan_scope)
+
+        return {
+          ...scan,
+          scanTarget: scope.scanTarget || scan.target_name,
+          osintDomain: scope.osintDomain,
+          ports: scope.ports,
+          resetMode: scope.resetMode,
+        }
+      }),
+    [scans]
+  )
+
+  const filteredScans = useMemo(
+    () => preparedScans.filter((scan) => matchesSearch(scan, searchTerm)),
+    [preparedScans, searchTerm]
+  )
 
   return (
     <main className="dashboard">
@@ -148,6 +198,23 @@ function App() {
         </section>
       )}
 
+      <section className="search-section">
+        <label htmlFor="dashboard-search">Search ReconDB</label>
+        <input
+          id="dashboard-search"
+          type="text"
+          placeholder="Search targets, ports, services, domains, status..."
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+        />
+
+        {searchTerm && (
+          <button type="button" onClick={() => setSearchTerm('')}>
+            Clear
+          </button>
+        )}
+      </section>
+
       <section className="table-section">
         <h2>Targets</h2>
 
@@ -161,7 +228,7 @@ function App() {
           </thead>
 
           <tbody>
-            {targets.map((target) => (
+            {filteredTargets.map((target) => (
               <tr key={target.target_id}>
                 <td>{target.target_id}</td>
                 <td>{target.target_name}</td>
@@ -189,7 +256,7 @@ function App() {
           </thead>
 
           <tbody>
-            {ports.map((port, index) => (
+            {filteredPorts.map((port, index) => (
               <tr key={index}>
                 <td>{port.target_name}</td>
                 <td>{port.hostname}</td>
@@ -197,7 +264,9 @@ function App() {
                 <td>{port.port_number}</td>
                 <td>{port.protocol}</td>
                 <td>{port.service_name}</td>
-                <td><StatusBadge value={port.state} /></td>
+                <td>
+                  <StatusBadge value={port.state} />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -218,7 +287,7 @@ function App() {
           </thead>
 
           <tbody>
-            {domains.map((domain, index) => (
+            {filteredDomains.map((domain, index) => (
               <tr key={index}>
                 <td>{domain.domain_name}</td>
                 <td>{domain.subdomain_name}</td>
@@ -243,7 +312,7 @@ function App() {
           </thead>
 
           <tbody>
-            {whois.map((record, index) => (
+            {filteredWhois.map((record, index) => (
               <tr key={index}>
                 <td>{record.domain_name}</td>
                 <td>{formatDate(record.collected_at)}</td>
@@ -272,22 +341,22 @@ function App() {
           </thead>
 
           <tbody>
-            {scans.map((scan) => {
-              const scope = parseScanScope(scan.scan_scope)
-
-              return (
-                <tr key={scan.scan_id}>
-                  <td>{scan.scan_id}</td>
-                  <td>{scope.scanTarget || scan.target_name}</td>
-                  <td>{scope.osintDomain}</td>
-                  <td>{scope.ports}</td>
-                  <td><ResetBadge value={scope.resetMode} /></td>
-                  <td>{scan.tool_used}</td>
-                  <td><StatusBadge value={scan.scan_status} /></td>
-                  <td>{formatDate(scan.completed_at)}</td>
-                </tr>
-              )
-            })}
+            {filteredScans.map((scan) => (
+              <tr key={scan.scan_id}>
+                <td>{scan.scan_id}</td>
+                <td>{scan.scanTarget}</td>
+                <td>{scan.osintDomain}</td>
+                <td>{scan.ports}</td>
+                <td>
+                  <ResetBadge value={scan.resetMode} />
+                </td>
+                <td>{scan.tool_used}</td>
+                <td>
+                  <StatusBadge value={scan.scan_status} />
+                </td>
+                <td>{formatDate(scan.completed_at)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </section>
