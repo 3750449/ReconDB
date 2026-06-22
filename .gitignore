@@ -30,5 +30,6 @@
 __pycache__/
 *.pyc
 
-
+data/scan.xml
+data/*.xml
 
