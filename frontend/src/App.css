@@ -125,3 +125,27 @@ td {
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.35);
 }
+
+.table-section {
+  overflow-x: auto;
+}
+
+table {
+  table-layout: fixed;
+}
+
+td,
+th {
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+td:nth-child(1),
+th:nth-child(1) {
+  width: 6%;
+}
+
+.badge {
+  white-space: nowrap;
+}
