@@ -14,11 +14,11 @@ app.add_middleware(
 )
 
 DB_CONFIG = {
-    "host": "localhost",
-    "user": "desmond",
-    "password": os.environ.get("MYSQL_PWD"),
-    "database": "recondb",
-    "charset": "utf8mb4"
+    "host": os.environ.get("MYSQL_HOST", "localhost"),
+    "user": os.environ.get("MYSQL_USER", "desmond"),
+    "password": os.environ.get("MYSQL_PASSWORD") or os.environ.get("MYSQL_PWD"),
+    "database": os.environ.get("MYSQL_DATABASE", "recondb"),
+    "charset": "utf8mb4",
 }
 
 @app.get("/")
