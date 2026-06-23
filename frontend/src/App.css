@@ -286,3 +286,25 @@ th:first-child {
   flex-shrink: 0;
 }
 
+.export-button {
+  display: block;
+  margin: 0 auto 1rem;
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.export-button:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.export-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+

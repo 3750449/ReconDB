@@ -74,6 +74,47 @@ function normalizeSortValue(value) {
   return String(value).toLowerCase()
 }
 
+function escapeCsvValue(value) {
+  if (value === null || value === undefined) return ''
+
+  const stringValue = String(value).replaceAll('"', '""')
+
+  if (
+    stringValue.includes(',') ||
+    stringValue.includes('"') ||
+    stringValue.includes('\n')
+  ) {
+    return `"${stringValue}"`
+  }
+
+  return stringValue
+}
+
+function downloadCsv(filename, rows, columns) {
+  if (!rows.length) return
+
+  const header = columns.map((column) => escapeCsvValue(column.label)).join(',')
+
+  const body = rows
+    .map((row) =>
+      columns
+        .map((column) => escapeCsvValue(row[column.key]))
+        .join(',')
+    )
+    .join('\n')
+
+  const csvContent = `${header}\n${body}`
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
 function sortRows(rows, sortConfig, tableName) {
   if (!sortConfig || sortConfig.table !== tableName) {
     return rows
@@ -337,6 +378,21 @@ function App() {
       <section className="table-section">
         <h2>Targets</h2>
 
+        <button
+          type="button"
+          className="export-button"
+          onClick={() =>
+            downloadCsv('recondb-targets.csv', sortedTargets, [
+              { label: 'ID', key: 'target_id' },
+              { label: 'Target Name', key: 'target_name' },
+              { label: 'Type', key: 'target_type' },
+            ])
+          }
+          disabled={sortedTargets.length === 0}
+        >
+          Export CSV
+        </button>
+
         <table>
           <thead>
             <tr>
@@ -382,6 +438,25 @@ function App() {
 
       <section className="table-section">
         <h2>Open Ports</h2>
+
+        <button
+          type="button"
+          className="export-button"
+          onClick={() =>
+            downloadCsv('recondb-open-ports.csv', sortedPorts, [
+              { label: 'Target', key: 'target_name' },
+              { label: 'Host', key: 'hostname' },
+              { label: 'IP Address', key: 'ip_address' },
+              { label: 'Port', key: 'port_number' },
+              { label: 'Protocol', key: 'protocol' },
+              { label: 'Service', key: 'service_name' },
+              { label: 'State', key: 'state' },
+            ])
+          }
+          disabled={sortedPorts.length === 0}
+        >
+          Export CSV
+        </button>
 
         <table>
           <thead>
@@ -463,6 +538,22 @@ function App() {
       <section className="table-section">
         <h2>Domains</h2>
 
+        <button
+          type="button"
+          className="export-button"
+          onClick={() =>
+            downloadCsv('recondb-domains.csv', sortedDomains, [
+              { label: 'Domain', key: 'domain_name' },
+              { label: 'Subdomain', key: 'subdomain_name' },
+              { label: 'IP Address', key: 'ip_address' },
+              { label: 'Created', key: 'created_at' },
+            ])
+          }
+          disabled={sortedDomains.length === 0}
+        >
+          Export CSV
+        </button>
+
         <table>
           <thead>
             <tr>
@@ -517,6 +608,21 @@ function App() {
       <section className="table-section">
         <h2>WHOIS Records</h2>
 
+        <button
+          type="button"
+          className="export-button"
+          onClick={() =>
+            downloadCsv('recondb-whois.csv', sortedWhois, [
+              { label: 'Domain', key: 'domain_name' },
+              { label: 'Collected At', key: 'collected_at' },
+              { label: 'Preview', key: 'whois_preview' },
+            ])
+          }
+          disabled={sortedWhois.length === 0}
+        >
+          Export CSV
+        </button>
+
         <table>
           <thead>
             <tr>
@@ -562,6 +668,26 @@ function App() {
 
       <section className="table-section">
         <h2>Scan History</h2>
+
+        <button
+          type="button"
+          className="export-button"
+          onClick={() =>
+            downloadCsv('recondb-scan-history.csv', sortedScans, [
+              { label: 'ID', key: 'scan_id' },
+              { label: 'Target', key: 'scanTarget' },
+              { label: 'OSINT Domain', key: 'osintDomain' },
+              { label: 'Ports', key: 'ports' },
+              { label: 'Reset Mode', key: 'resetMode' },
+              { label: 'Tool', key: 'tool_used' },
+              { label: 'Status', key: 'scan_status' },
+              { label: 'Completed', key: 'completed_at' },
+            ])
+          }
+          disabled={sortedScans.length === 0}
+        >
+          Export CSV
+        </button>
 
         <table className="scan-table">
           <thead>
