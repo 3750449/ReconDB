@@ -263,3 +263,14 @@ th:first-child {
 .active-sort {
   color: #38bdf8;
 }
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.sort-button span {
+  flex-shrink: 0;
+}
