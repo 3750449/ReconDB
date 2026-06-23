@@ -274,3 +274,15 @@ th:first-child {
 .sort-button span {
   flex-shrink: 0;
 }
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.sort-button span {
+  flex-shrink: 0;
+}
+
