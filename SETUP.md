@@ -102,7 +102,7 @@ source .venv/bin/activate
 Install API dependencies:
 
 ```bash
-pip install fastapi uvicorn pymysql
+pip install -r requirements.txt
 ```
 
 ---
