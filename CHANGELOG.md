@@ -12,12 +12,14 @@ All notable changes to ReconDB will be documented in this file.
 - CORS middleware support for the React dashboard
 - Frontend API base URL environment variable support
 - API database configuration environment variable support
+- Python `requirements.txt` for backend/API dependencies
 
 ### Changed
 
 - FastAPI can now read database settings from environment variables
 - React can now read the API base URL from `VITE_API_BASE_URL`
 - Dashboard frontend can connect cleanly to the FastAPI backend from Vite development ports
+- Setup guide now uses `pip install -r requirements.txt`
 
 ---
 
