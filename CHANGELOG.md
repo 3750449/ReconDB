@@ -4,6 +4,23 @@ All notable changes to ReconDB will be documented in this file.
 
 ---
 
+## v0.6.6 - Environment Config and CORS Support
+
+### Added
+
+- `.env.example` file for documenting required environment variables
+- CORS middleware support for the React dashboard
+- Frontend API base URL environment variable support
+- API database configuration environment variable support
+
+### Changed
+
+- FastAPI can now read database settings from environment variables
+- React can now read the API base URL from `VITE_API_BASE_URL`
+- Dashboard frontend can connect cleanly to the FastAPI backend from Vite development ports
+
+---
+
 ## v0.6.4 - Dashboard Search and Scan History
 
 ### Added
