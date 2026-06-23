@@ -4,6 +4,20 @@ All notable changes to ReconDB will be documented in this file.
 
 ---
 
+## v0.6.8 - CSV Dashboard Exports
+
+### Added
+
+- CSV export buttons for dashboard tables
+- CSV export support for targets, open ports, domains, WHOIS records, and scan history
+- CSV escaping for commas, quotes, and multiline values
+
+### Changed
+
+- Dashboard data can now be exported for reporting and offline analysis
+
+---
+
 ## v0.6.7 - Sortable Dashboard Tables
 
 ### Added
