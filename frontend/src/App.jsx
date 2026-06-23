@@ -56,6 +56,45 @@ function matchesSearch(item, searchTerm) {
     .includes(searchTerm.toLowerCase())
 }
 
+function normalizeSortValue(value) {
+  if (value === null || value === undefined) return ''
+
+  if (typeof value === 'number') return value
+
+  const date = new Date(value)
+  if (!Number.isNaN(date.getTime()) && String(value).includes('-')) {
+    return date.getTime()
+  }
+
+  const numericValue = Number(value)
+  if (!Number.isNaN(numericValue) && value !== '') {
+    return numericValue
+  }
+
+  return String(value).toLowerCase()
+}
+
+function sortRows(rows, sortConfig, tableName) {
+  if (!sortConfig || sortConfig.table !== tableName) {
+    return rows
+  }
+
+  return [...rows].sort((a, b) => {
+    const aValue = normalizeSortValue(a[sortConfig.key])
+    const bValue = normalizeSortValue(b[sortConfig.key])
+
+    if (aValue < bValue) {
+      return sortConfig.direction === 'asc' ? -1 : 1
+    }
+
+    if (aValue > bValue) {
+      return sortConfig.direction === 'asc' ? 1 : -1
+    }
+
+    return 0
+  })
+}
+
 function StatusBadge({ value }) {
   return <span className={`badge badge-${value}`}>{value}</span>
 }
@@ -77,6 +116,29 @@ function NoResultsRow({ colSpan }) {
   )
 }
 
+function SortableTh({ label, tableName, columnKey, sortConfig, onSort }) {
+  const isActive =
+    sortConfig?.table === tableName && sortConfig?.key === columnKey
+
+  const arrow = isActive
+    ? sortConfig.direction === 'asc'
+      ? '▲'
+      : '▼'
+    : '↕'
+
+  return (
+    <th>
+      <button
+        type="button"
+        className={`sort-button ${isActive ? 'active-sort' : ''}`}
+        onClick={() => onSort(tableName, columnKey)}
+      >
+        {label} <span>{arrow}</span>
+      </button>
+    </th>
+  )
+}
+
 function App() {
   const [summary, setSummary] = useState(null)
   const [targets, setTargets] = useState([])
@@ -85,6 +147,7 @@ function App() {
   const [whois, setWhois] = useState([])
   const [scans, setScans] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [sortConfig, setSortConfig] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -121,6 +184,27 @@ function App() {
       .then((res) => setScans(res.data))
       .catch(console.error)
   }, [])
+
+  function handleSort(tableName, columnKey) {
+    setSortConfig((currentSort) => {
+      if (
+        currentSort?.table === tableName &&
+        currentSort?.key === columnKey
+      ) {
+        return {
+          table: tableName,
+          key: columnKey,
+          direction: currentSort.direction === 'asc' ? 'desc' : 'asc',
+        }
+      }
+
+      return {
+        table: tableName,
+        key: columnKey,
+        direction: 'asc',
+      }
+    })
+  }
 
   const filteredTargets = useMemo(
     () => targets.filter((target) => matchesSearch(target, searchTerm)),
@@ -161,6 +245,31 @@ function App() {
   const filteredScans = useMemo(
     () => preparedScans.filter((scan) => matchesSearch(scan, searchTerm)),
     [preparedScans, searchTerm]
+  )
+
+  const sortedTargets = useMemo(
+    () => sortRows(filteredTargets, sortConfig, 'targets'),
+    [filteredTargets, sortConfig]
+  )
+
+  const sortedPorts = useMemo(
+    () => sortRows(filteredPorts, sortConfig, 'ports'),
+    [filteredPorts, sortConfig]
+  )
+
+  const sortedDomains = useMemo(
+    () => sortRows(filteredDomains, sortConfig, 'domains'),
+    [filteredDomains, sortConfig]
+  )
+
+  const sortedWhois = useMemo(
+    () => sortRows(filteredWhois, sortConfig, 'whois'),
+    [filteredWhois, sortConfig]
+  )
+
+  const sortedScans = useMemo(
+    () => sortRows(filteredScans, sortConfig, 'scans'),
+    [filteredScans, sortConfig]
   )
 
   return (
@@ -231,17 +340,35 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Target Name</th>
-              <th>Type</th>
+              <SortableTh
+                label="ID"
+                tableName="targets"
+                columnKey="target_id"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Target Name"
+                tableName="targets"
+                columnKey="target_name"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Type"
+                tableName="targets"
+                columnKey="target_type"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             </tr>
           </thead>
 
           <tbody>
-            {filteredTargets.length === 0 ? (
+            {sortedTargets.length === 0 ? (
               <NoResultsRow colSpan={3} />
             ) : (
-              filteredTargets.map((target) => (
+              sortedTargets.map((target) => (
                 <tr key={target.target_id}>
                   <td>{target.target_id}</td>
                   <td>{target.target_name}</td>
@@ -259,21 +386,63 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>Target</th>
-              <th>Host</th>
-              <th>IP Address</th>
-              <th>Port</th>
-              <th>Protocol</th>
-              <th>Service</th>
-              <th>State</th>
+              <SortableTh
+                label="Target"
+                tableName="ports"
+                columnKey="target_name"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Host"
+                tableName="ports"
+                columnKey="hostname"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="IP Address"
+                tableName="ports"
+                columnKey="ip_address"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Port"
+                tableName="ports"
+                columnKey="port_number"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Protocol"
+                tableName="ports"
+                columnKey="protocol"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Service"
+                tableName="ports"
+                columnKey="service_name"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="State"
+                tableName="ports"
+                columnKey="state"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             </tr>
           </thead>
 
           <tbody>
-            {filteredPorts.length === 0 ? (
+            {sortedPorts.length === 0 ? (
               <NoResultsRow colSpan={7} />
             ) : (
-              filteredPorts.map((port, index) => (
+              sortedPorts.map((port, index) => (
                 <tr key={index}>
                   <td>{port.target_name}</td>
                   <td>{port.hostname}</td>
@@ -297,18 +466,42 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>Domain</th>
-              <th>Subdomain</th>
-              <th>IP Address</th>
-              <th>Created</th>
+              <SortableTh
+                label="Domain"
+                tableName="domains"
+                columnKey="domain_name"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Subdomain"
+                tableName="domains"
+                columnKey="subdomain_name"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="IP Address"
+                tableName="domains"
+                columnKey="ip_address"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Created"
+                tableName="domains"
+                columnKey="created_at"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             </tr>
           </thead>
 
           <tbody>
-            {filteredDomains.length === 0 ? (
+            {sortedDomains.length === 0 ? (
               <NoResultsRow colSpan={4} />
             ) : (
-              filteredDomains.map((domain, index) => (
+              sortedDomains.map((domain, index) => (
                 <tr key={index}>
                   <td>{domain.domain_name}</td>
                   <td>{domain.subdomain_name}</td>
@@ -327,17 +520,35 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>Domain</th>
-              <th>Collected At</th>
-              <th>Preview</th>
+              <SortableTh
+                label="Domain"
+                tableName="whois"
+                columnKey="domain_name"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Collected At"
+                tableName="whois"
+                columnKey="collected_at"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Preview"
+                tableName="whois"
+                columnKey="whois_preview"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             </tr>
           </thead>
 
           <tbody>
-            {filteredWhois.length === 0 ? (
+            {sortedWhois.length === 0 ? (
               <NoResultsRow colSpan={3} />
             ) : (
-              filteredWhois.map((record, index) => (
+              sortedWhois.map((record, index) => (
                 <tr key={index}>
                   <td>{record.domain_name}</td>
                   <td>{formatDate(record.collected_at)}</td>
@@ -355,22 +566,70 @@ function App() {
         <table className="scan-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Target</th>
-              <th>OSINT Domain</th>
-              <th>Ports</th>
-              <th>Reset Mode</th>
-              <th>Tool</th>
-              <th>Status</th>
-              <th>Completed</th>
+              <SortableTh
+                label="ID"
+                tableName="scans"
+                columnKey="scan_id"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Target"
+                tableName="scans"
+                columnKey="scanTarget"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="OSINT Domain"
+                tableName="scans"
+                columnKey="osintDomain"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Ports"
+                tableName="scans"
+                columnKey="ports"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Reset Mode"
+                tableName="scans"
+                columnKey="resetMode"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Tool"
+                tableName="scans"
+                columnKey="tool_used"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Status"
+                tableName="scans"
+                columnKey="scan_status"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableTh
+                label="Completed"
+                tableName="scans"
+                columnKey="completed_at"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             </tr>
           </thead>
 
           <tbody>
-            {filteredScans.length === 0 ? (
+            {sortedScans.length === 0 ? (
               <NoResultsRow colSpan={8} />
             ) : (
-              filteredScans.map((scan) => (
+              sortedScans.map((scan) => (
                 <tr key={scan.scan_id}>
                   <td>{scan.scan_id}</td>
                   <td>{scan.scanTarget}</td>

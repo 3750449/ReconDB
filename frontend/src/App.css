@@ -239,3 +239,27 @@ th:first-child {
   padding: 1.5rem;
 }
 
+.sort-button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sort-button:hover {
+  color: #38bdf8;
+}
+
+.sort-button span {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.active-sort {
+  color: #38bdf8;
+}
