@@ -4,6 +4,22 @@ All notable changes to ReconDB will be documented in this file.
 
 ---
 
+## v0.6.7 - Sortable Dashboard Tables
+
+### Added
+
+- Clickable sortable table headers
+- Ascending and descending table sorting
+- Sort indicators for active dashboard columns
+- Sorting support for targets, open ports, domains, WHOIS records, and scan history
+
+### Changed
+
+- Improved sortable table header layout
+- Improved dashboard data navigation
+
+---
+
 ## v0.6.6 - Environment Config and CORS Support
 
 ### Added
