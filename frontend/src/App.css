@@ -307,4 +307,31 @@ th:first-child {
   opacity: 0.45;
 }
 
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  color: #94a3b8;
+  font-weight: 700;
+}
 
+.pagination-controls button {
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pagination-controls button:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.pagination-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}

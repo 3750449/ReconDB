@@ -97,9 +97,7 @@ function downloadCsv(filename, rows, columns) {
 
   const body = rows
     .map((row) =>
-      columns
-        .map((column) => escapeCsvValue(row[column.key]))
-        .join(',')
+      columns.map((column) => escapeCsvValue(row[column.key])).join(',')
     )
     .join('\n')
 
@@ -180,6 +178,28 @@ function SortableTh({ label, tableName, columnKey, sortConfig, onSort }) {
   )
 }
 
+function PaginationControls({ currentPage, totalPages, onPrevious, onNext }) {
+  return (
+    <div className="pagination-controls">
+      <button type="button" onClick={onPrevious} disabled={currentPage === 1}>
+        Previous
+      </button>
+
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
+
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </button>
+    </div>
+  )
+}
+
 function App() {
   const [summary, setSummary] = useState(null)
   const [targets, setTargets] = useState([])
@@ -189,7 +209,10 @@ function App() {
   const [scans, setScans] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [sortConfig, setSortConfig] = useState(null)
+  const [portsPage, setPortsPage] = useState(1)
   const [error, setError] = useState('')
+
+  const rowsPerPage = 10
 
   useEffect(() => {
     axios
@@ -225,6 +248,10 @@ function App() {
       .then((res) => setScans(res.data))
       .catch(console.error)
   }, [])
+
+  useEffect(() => {
+    setPortsPage(1)
+  }, [searchTerm, sortConfig])
 
   function handleSort(tableName, columnKey) {
     setSortConfig((currentSort) => {
@@ -312,6 +339,18 @@ function App() {
     () => sortRows(filteredScans, sortConfig, 'scans'),
     [filteredScans, sortConfig]
   )
+
+  const totalPortsPages = Math.max(
+    1,
+    Math.ceil(sortedPorts.length / rowsPerPage)
+  )
+
+  const paginatedPorts = useMemo(() => {
+    const startIndex = (portsPage - 1) * rowsPerPage
+    const endIndex = startIndex + rowsPerPage
+
+    return sortedPorts.slice(startIndex, endIndex)
+  }, [sortedPorts, portsPage])
 
   return (
     <main className="dashboard">
@@ -517,8 +556,8 @@ function App() {
             {sortedPorts.length === 0 ? (
               <NoResultsRow colSpan={7} />
             ) : (
-              sortedPorts.map((port, index) => (
-                <tr key={index}>
+              paginatedPorts.map((port, index) => (
+                <tr key={`${port.target_name}-${port.ip_address}-${port.port_number}-${index}`}>
                   <td>{port.target_name}</td>
                   <td>{port.hostname}</td>
                   <td>{port.ip_address}</td>
@@ -533,6 +572,17 @@ function App() {
             )}
           </tbody>
         </table>
+
+        {sortedPorts.length > rowsPerPage && (
+          <PaginationControls
+            currentPage={portsPage}
+            totalPages={totalPortsPages}
+            onPrevious={() => setPortsPage((page) => Math.max(1, page - 1))}
+            onNext={() =>
+              setPortsPage((page) => Math.min(totalPortsPages, page + 1))
+            }
+          />
+        )}
       </section>
 
       <section className="table-section">
