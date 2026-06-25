@@ -134,6 +134,17 @@ function sortRows(rows, sortConfig, tableName) {
   })
 }
 
+function paginateRows(rows, currentPage, rowsPerPage) {
+  const startIndex = (currentPage - 1) * rowsPerPage
+  const endIndex = startIndex + rowsPerPage
+
+  return rows.slice(startIndex, endIndex)
+}
+
+function getTotalPages(rows, rowsPerPage) {
+  return Math.max(1, Math.ceil(rows.length / rowsPerPage))
+}
+
 function StatusBadge({ value }) {
   return <span className={`badge badge-${value}`}>{value}</span>
 }
@@ -209,7 +220,11 @@ function App() {
   const [scans, setScans] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [sortConfig, setSortConfig] = useState(null)
+  const [targetsPage, setTargetsPage] = useState(1)
   const [portsPage, setPortsPage] = useState(1)
+  const [domainsPage, setDomainsPage] = useState(1)
+  const [whoisPage, setWhoisPage] = useState(1)
+  const [scansPage, setScansPage] = useState(1)
   const [error, setError] = useState('')
 
   const rowsPerPage = 10
@@ -250,7 +265,11 @@ function App() {
   }, [])
 
   useEffect(() => {
+    setTargetsPage(1)
     setPortsPage(1)
+    setDomainsPage(1)
+    setWhoisPage(1)
+    setScansPage(1)
   }, [searchTerm, sortConfig])
 
   function handleSort(tableName, columnKey) {
@@ -340,17 +359,36 @@ function App() {
     [filteredScans, sortConfig]
   )
 
-  const totalPortsPages = Math.max(
-    1,
-    Math.ceil(sortedPorts.length / rowsPerPage)
+  const totalTargetsPages = getTotalPages(sortedTargets, rowsPerPage)
+  const totalPortsPages = getTotalPages(sortedPorts, rowsPerPage)
+  const totalDomainsPages = getTotalPages(sortedDomains, rowsPerPage)
+  const totalWhoisPages = getTotalPages(sortedWhois, rowsPerPage)
+  const totalScansPages = getTotalPages(sortedScans, rowsPerPage)
+
+  const paginatedTargets = useMemo(
+    () => paginateRows(sortedTargets, targetsPage, rowsPerPage),
+    [sortedTargets, targetsPage]
   )
 
-  const paginatedPorts = useMemo(() => {
-    const startIndex = (portsPage - 1) * rowsPerPage
-    const endIndex = startIndex + rowsPerPage
+  const paginatedPorts = useMemo(
+    () => paginateRows(sortedPorts, portsPage, rowsPerPage),
+    [sortedPorts, portsPage]
+  )
 
-    return sortedPorts.slice(startIndex, endIndex)
-  }, [sortedPorts, portsPage])
+  const paginatedDomains = useMemo(
+    () => paginateRows(sortedDomains, domainsPage, rowsPerPage),
+    [sortedDomains, domainsPage]
+  )
+
+  const paginatedWhois = useMemo(
+    () => paginateRows(sortedWhois, whoisPage, rowsPerPage),
+    [sortedWhois, whoisPage]
+  )
+
+  const paginatedScans = useMemo(
+    () => paginateRows(sortedScans, scansPage, rowsPerPage),
+    [sortedScans, scansPage]
+  )
 
   return (
     <main className="dashboard">
@@ -463,7 +501,7 @@ function App() {
             {sortedTargets.length === 0 ? (
               <NoResultsRow colSpan={3} />
             ) : (
-              sortedTargets.map((target) => (
+              paginatedTargets.map((target) => (
                 <tr key={target.target_id}>
                   <td>{target.target_id}</td>
                   <td>{target.target_name}</td>
@@ -473,6 +511,17 @@ function App() {
             )}
           </tbody>
         </table>
+
+        {sortedTargets.length > rowsPerPage && (
+          <PaginationControls
+            currentPage={targetsPage}
+            totalPages={totalTargetsPages}
+            onPrevious={() => setTargetsPage((page) => Math.max(1, page - 1))}
+            onNext={() =>
+              setTargetsPage((page) => Math.min(totalTargetsPages, page + 1))
+            }
+          />
+        )}
       </section>
 
       <section className="table-section">
@@ -557,7 +606,9 @@ function App() {
               <NoResultsRow colSpan={7} />
             ) : (
               paginatedPorts.map((port, index) => (
-                <tr key={`${port.target_name}-${port.ip_address}-${port.port_number}-${index}`}>
+                <tr
+                  key={`${port.target_name}-${port.ip_address}-${port.port_number}-${index}`}
+                >
                   <td>{port.target_name}</td>
                   <td>{port.hostname}</td>
                   <td>{port.ip_address}</td>
@@ -642,8 +693,8 @@ function App() {
             {sortedDomains.length === 0 ? (
               <NoResultsRow colSpan={4} />
             ) : (
-              sortedDomains.map((domain, index) => (
-                <tr key={index}>
+              paginatedDomains.map((domain, index) => (
+                <tr key={`${domain.domain_name}-${domain.ip_address}-${index}`}>
                   <td>{domain.domain_name}</td>
                   <td>{domain.subdomain_name}</td>
                   <td>{domain.ip_address}</td>
@@ -653,6 +704,17 @@ function App() {
             )}
           </tbody>
         </table>
+
+        {sortedDomains.length > rowsPerPage && (
+          <PaginationControls
+            currentPage={domainsPage}
+            totalPages={totalDomainsPages}
+            onPrevious={() => setDomainsPage((page) => Math.max(1, page - 1))}
+            onNext={() =>
+              setDomainsPage((page) => Math.min(totalDomainsPages, page + 1))
+            }
+          />
+        )}
       </section>
 
       <section className="table-section">
@@ -704,8 +766,8 @@ function App() {
             {sortedWhois.length === 0 ? (
               <NoResultsRow colSpan={3} />
             ) : (
-              sortedWhois.map((record, index) => (
-                <tr key={index}>
+              paginatedWhois.map((record, index) => (
+                <tr key={`${record.domain_name}-${record.collected_at}-${index}`}>
                   <td>{record.domain_name}</td>
                   <td>{formatDate(record.collected_at)}</td>
                   <td>{record.whois_preview}</td>
@@ -714,6 +776,17 @@ function App() {
             )}
           </tbody>
         </table>
+
+        {sortedWhois.length > rowsPerPage && (
+          <PaginationControls
+            currentPage={whoisPage}
+            totalPages={totalWhoisPages}
+            onPrevious={() => setWhoisPage((page) => Math.max(1, page - 1))}
+            onNext={() =>
+              setWhoisPage((page) => Math.min(totalWhoisPages, page + 1))
+            }
+          />
+        )}
       </section>
 
       <section className="table-section">
@@ -805,7 +878,7 @@ function App() {
             {sortedScans.length === 0 ? (
               <NoResultsRow colSpan={8} />
             ) : (
-              sortedScans.map((scan) => (
+              paginatedScans.map((scan) => (
                 <tr key={scan.scan_id}>
                   <td>{scan.scan_id}</td>
                   <td>{scan.scanTarget}</td>
@@ -824,6 +897,17 @@ function App() {
             )}
           </tbody>
         </table>
+
+        {sortedScans.length > rowsPerPage && (
+          <PaginationControls
+            currentPage={scansPage}
+            totalPages={totalScansPages}
+            onPrevious={() => setScansPage((page) => Math.max(1, page - 1))}
+            onNext={() =>
+              setScansPage((page) => Math.min(totalScansPages, page + 1))
+            }
+          />
+        )}
       </section>
     </main>
   )
