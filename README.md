@@ -11,4 +11,4 @@ It combines a MySQL database, Python automation, Nmap XML ingestion, DNS and WHO
 ## Current Version
 
 ```text
-v0.6.4
+v0.7.0
