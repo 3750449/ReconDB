@@ -4,6 +4,21 @@ All notable changes to ReconDB will be documented in this file.
 
 ---
 
+## v0.6.9 - Open Ports Pagination
+
+### Added
+
+- Pagination controls for the Open Ports dashboard table
+- Previous and Next navigation for paginated port results
+- Page count display for Open Ports results
+
+### Changed
+
+- Open Ports table now displays a limited number of rows per page
+- Search and sorting reset the Open Ports table back to page 1
+
+---
+
 ## v0.6.8 - CSV Dashboard Exports
 
 ### Added
