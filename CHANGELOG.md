@@ -4,6 +4,23 @@ All notable changes to ReconDB will be documented in this file.
 
 ---
 
+## v0.7.0 - Dashboard-Wide Pagination
+
+### Added
+
+- Pagination controls for all dashboard tables
+- Separate page tracking for Targets, Open Ports, Domains, WHOIS Records, and Scan History
+- Reusable pagination helper logic for table rows
+- Previous and Next navigation across dashboard sections
+
+### Changed
+
+- Dashboard tables now show a limited number of rows per page
+- Search and sorting reset all dashboard tables back to page 1
+- Open Ports pagination was expanded into dashboard-wide pagination
+
+---
+
 ## v0.6.9 - Open Ports Pagination
 
 ### Added
